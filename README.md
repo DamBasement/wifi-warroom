@@ -33,13 +33,12 @@ Every file is written to be terminal-friendly, SSH-compatible, and exam-ready (O
 
 ---
 
-## 🧠 Philosophy
+No GUI. No autopilot.
+This repo is for those who weaponize terminals and read packets like poetry.
+Manual attacks only — from raw capture to final crack.
 
-Forget point-and-click tools.  
-This repo is about **manual mastery** — command-line only, no GUI, no fluff.
-
-> _"If it can be sniffed, it can be cracked."_  
-> — me, probably
+"If it speaks in frames, we speak back in fire."
+— someone deep in monitor mode
 
 ---
 
