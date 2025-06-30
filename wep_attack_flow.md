@@ -3,6 +3,18 @@
 
 ## ⚙️ 0. Initial Setup
 
+📌 Get your interface MAC (before monitor mode) via:
+
+```bash
+cat /sys/class/net/wlan0/address
+```
+or
+```bash
+ip link show wlan0
+```
+
+then let's go!
+
 ```bash
 sudo airmon-ng check kill
 sudo airmon-ng start wlan0
@@ -42,12 +54,6 @@ sudo aireplay-ng --arpreplay -b <BSSID> -h <YOUR_MAC> wlan0mon
 ```
 
 Injects ARP requests to increase `#Data`.
-
-📌 Get your interface MAC (before monitor mode) via:
-
-```bash
-cat /sys/class/net/wlan0mon/address
-```
 
 ---
 
