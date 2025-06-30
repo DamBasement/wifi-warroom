@@ -49,11 +49,13 @@ Collects IVs for cracking.
 
 ## 🚀 3. ARP Replay Attack
 
+
 ```bash
 sudo aireplay-ng --arpreplay -b <BSSID> -h <YOUR_MAC> wlan0mon
 ```
 
 Injects ARP requests to increase `#Data`.
+`-h` needs **your** MAC not a random one. We are pretending to be a legitimate client.
 
 ---
 
@@ -69,7 +71,7 @@ Forces a client to reconnect and trigger ARP traffic.
 
 ## 🔓 5. Crack the WEP Key
 
-When you see 20.000–30.000 IV in the #Data column you need to:
+When you see 20.000–30.000 IV in the `#Data` column you need to:
 
 
 ```bash
