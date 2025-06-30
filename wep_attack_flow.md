@@ -69,6 +69,9 @@ Forces a client to reconnect and trigger ARP traffic.
 
 ## 🔓 5. Crack the WEP Key
 
+When you see 20.000–30.000 IV in the #Data column you need to:
+
+
 ```bash
 aircrack-ng dump-01.cap
 ```
