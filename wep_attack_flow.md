@@ -53,8 +53,6 @@ Collects IVs for cracking.
 sudo aireplay-ng -1 3600 -q 10 -a <BSSID> wlan0mon
 ```
 
-Collects IVs for cracking.
-
 ---
 
 ## 💣 3. (Optional) Deauth Attack
@@ -150,7 +148,8 @@ sudo aireplay-ng -1 3600 -q 10 -a <BSSID> wlan0mon
 ```
 
 No! they are not! they are similar but not the same. And here is why: 
-📌 Command 1 – One-Time Fake Auth
+
+## 📌 Command 1 – One-Time Fake Auth
 
 ```bash
 sudo aireplay-ng --fakeauth 0 -a <BSSID> -h <YOUR_MAC> wlan0mon
