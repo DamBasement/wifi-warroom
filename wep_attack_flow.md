@@ -47,7 +47,7 @@ Collects IVs for cracking.
 
 ---
 
-## 🔐 2. Fake Auth (mandatory before injection)
+## 🔐 2. At the same time: Fake Auth (mandatory before injection)
 
 ```bash
 sudo aireplay-ng -1 3600 -q 10 -a <BSSID> wlan0mon
@@ -67,7 +67,7 @@ Forces a client to reconnect and trigger ARP traffic.
 
 ---
 
-## 🚀 4. ARP Replay Attack
+## 🚀 4. At the same time: ARP Replay Attack
 
 
 ```bash
@@ -79,7 +79,7 @@ Injects ARP requests to increase `#Data`.
 
 ---
 
-## 🔓 5. Crack the WEP Key
+## 🔓 5. At the same time: Crack the WEP Key
 
 When you see 20.000–30.000 IV in the `#Data` column you need to:
 
