@@ -111,7 +111,7 @@ network={
 ```bash
 sudo airmon-ng stop wlan0mon
 sudo wpa_supplicant -i wlan0 -c wep.conf -D nl80211
-sudo dhclient wlan0
+sudo dhclient wlan0 -v
 ```
 
 ---
