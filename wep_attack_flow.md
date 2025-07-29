@@ -1,9 +1,10 @@
 
-# 🛡️ WEP Attack – SSH-only, exam-style flow
+# 🛡️ WEP Attack
+## Time to perform this attack: 7 minutes
 
 ## ⚙️ 0. Initial Setup
 
-📌 Get your interface MAC (before monitor mode) via:
+Get your interface MAC (before monitor mode) via:
 
 ```bash
 cat /sys/class/net/wlan0/address
@@ -72,6 +73,8 @@ In a new terminal tab.
 Start monitoring specifically on AP ‘wifi-corp’ and dump the output in a capture file. Use copy and paste to execute the following command(s):
 
 ```bash
+mkdir WEP
+
 channel=3
 bssid='F0:9F:C2:71:22:11'
 essid='wifi-old'
@@ -153,9 +156,6 @@ cat << EOF > /tmp/wep.conf
           }
 EOF
 ```
----
-
-### Launch
 
 ```bash
 sudo wpa_supplicant -i wlan0 -c wep.conf
