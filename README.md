@@ -1,53 +1,68 @@
-# WiFi-warROOOOOOM
+# 🛰️ WiFi-warROOOOOOM
 
-*Protocols are weak. Frequencies are open.*  
-This is a personal logbook of wireless warfare.
-
----
-
-## Overview
-
-This repo collects field notes, attack flows, and technical references  
-for wireless exploitation — WEP, WPA2-PSK, WPA2-Enterprise.
-
-Everything is terminal-first and SSH-safe.  
-No screenshots. No GUIs. Just command-line.
+**Protocols are weak. Frequencies are open.**  
+This is my war log — a CLI-first battleground for wireless exploitation.
 
 ---
 
-## Structure
+## 🗺️ Overview
 
-- `wep_attack_flow.md`  
-  Walkthrough for cracking WEP using aircrack-ng and wpa_supplicant
+A curated collection of **attack flows**, **field notes**, and **hands-on exploits**  
+covering WEP, WPA2-PSK, and WPA2-Enterprise.
 
-- `wpa2_psk_crack.md`
-  Walkthrough for cracking WPA2-PSK using aircrack-ng and wpa_supplicant
+- No screenshots.  
+- No GUIs.  
+- **Just command-line and rage.**
 
-- `enterprise_mitm_eap.md`
-  Walkthrough for cracking Enterprise MGT using Hostapd-mana and Freeradius
-
----
-
-## Tools
-
-- aircrack-ng  
-- airodump-ng / aireplay-ng  
-- wpa_supplicant  
-- tshark / Wireshark  
-- iwconfig / ip / dhclient
-- Hostapd-mana
-- Freeradius
+Perfect for red teamers, OSWP prep, or anyone who thinks air is free real estate.
 
 ---
 
-Manual attacks only.  
-From raw PCAPs to handshake extraction to deauth brute-force.  
+## 📁 Repo Structure
+
+| File | Description |
+|------|-------------|
+| `wep_attack_flow.md` | WEP cracking walkthrough using `aircrack-ng` + `wpa_supplicant` |
+| `wpa2_psk_crack.md` | WPA2-PSK handshake capture and offline brute-force |
+| `enterprise_mitm_eap.md` | WPA2-Enterprise Evil Twin attack with `hostapd-mana` + `freeradius` |
 
 ---
 
-## Notes
+## 🧰 Tools in Use
 
-Tested in controlled environments.  
-Use only where legally and ethically allowed.
+- `aircrack-ng`, `airodump-ng`, `aireplay-ng`
+- `wpa_supplicant`
+- `hostapd-mana`, `freeradius`
+- `iw`, `ip`, `dhclient`
+- `tshark`, `Wireshark`
+
+All CLI. All tested.  
+Most run fine over SSH if you like to break things from a distance.
 
 ---
+
+## 🧪 Attack Philosophy
+
+- Manual attacks only  
+- No magic scripts  
+- Start from `.pcap`, end with creds or keys  
+- Emphasis on **understanding every packet**
+
+---
+
+## ⚠️ Notes & Crediz!
+
+All techniques tested in **controlled environments**.
+# What controlled env? https://lab.wifichallenge.com/
+
+---
+
+## 🧠 Author
+
+Crafted by [@DamBasement](https://github.com/DamBasement)  
+Built in frustration, refined by obsession.
+
+---
+
+> _“If they control the air, they control the battlefield.”_  
+> — Some layer 2 nihilist, probably
