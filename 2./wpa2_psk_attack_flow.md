@@ -1,4 +1,3 @@
-
 # 🛡️ WPA2-PSK Attack
 ## Time to perform the attack: 7 minutes
 
