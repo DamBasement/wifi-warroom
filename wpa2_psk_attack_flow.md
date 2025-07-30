@@ -16,6 +16,7 @@ Monitor mode enabled on `wlan0mon`.
 ## 🔍 Scan for Targets
 
 Since WPA2 works both on 2,4Ghz and 5Ghz, check what access points (APs) are active on those frequencies.
+
 **To recognize them check for WPA2-PSK and Cipher CCMP**
 
 ```bash
