@@ -45,6 +45,17 @@ sudo airodump-ng -c ${channel} wlan0mon
 ## 🎯 Capture Handshake
 
 It's time to Capture the Handshake and for this we'll capture an **authentication handshake**.
+**NOTE:** **WPA2 doesn’t reuse IVs as WEP does**. It uses a secure 4-way handshake to derive session keys.
+
+    The attack focuses on capturing this handshake, which occurs only when a client **connects** to the network.
+
+    The handshake contains hashed information that can be brute-forced **offline** if the password is weak.
+
+So, we send deauthentication frames to a connected client. The client is forced to disconnect and reconnect. The handshake is captured. BOOM!
+
+📌 It's important to understand that deauth doesn’t flood traffic; it simply forces a re-authentication to trigger the handshake.
+
+Let's do it:
 
 ```bash
 mkdir WPA2
