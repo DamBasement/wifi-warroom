@@ -1,6 +1,6 @@
 
 # 🛡️ WPA2-PSK Attack
-## Time to complete the attack: 7 minutes
+## Time to perform the attack: 7 minutes
 
 ## ⚙️ 0. Initial Setup
 
