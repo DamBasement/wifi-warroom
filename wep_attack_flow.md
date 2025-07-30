@@ -4,17 +4,7 @@
 
 ## ⚙️ Initial Setup
 
-Get your interface MAC (before monitor mode) via:
-
-```bash
-cat /sys/class/net/wlan0/address
-```
-or
-```bash
-ip link show wlan0
-```
-
-Then let's go!
+Let's go!
 
 ```bash
 sudo airmon-ng check kill
@@ -69,8 +59,21 @@ Now we are ready to **Capture the Handshake**, in particular we will capture an 
 
 ## Start the Attack
 
-In a new terminal tab. 
-Start monitoring specifically on AP ‘wifi-corp’ and dump the output in a capture file. Use copy and paste to execute the following command(s):
+For WEP we will do a deauthentication attack plus ARP injection.
+
+Let's see why
+
+### Deauth Attack
+Here we send deauth frames to a connected client. This forces the client to disconnect and reconnect to the WEP network.
+
+Upon reconnection, there's a high chance the client will send an **ARP request** to the access point — **this** is the perfect packet to capture.
+
+### Capture ARP + Start Injection
+Once the ARP request is captured, tools like `aireplay-ng -3` can replay it repeatedly, causing the AP to send out tons of encrypted responses — each using **a new IV** (Initialization Vector).
+
+This allows you to accumulate enough IVs quickly for aircrack-ng to recover the WEP key via statistical analysis.
+
+In a new terminal tab let's start sniffing specifically on AP ‘wifi-corp’ and dump the output in a capture file.
 
 ```bash
 mkdir WEP
@@ -85,10 +88,12 @@ sudo airodump-ng -c ${channel}  -w dump-wep --output-format pcap,csv --essid ${e
 
 ---
 
+Now deauth the client!
+
 ## 💣 De-AUTH
 
-In a second terminal tab. 
-Send a deauthentication frame. 
+In a second terminal tab send a deauthentication frame. 
+
 In that case the connected client will try to re-authenticate again during our capture.
 
 
@@ -99,7 +104,6 @@ client='3E:C8:44:0A:24:BA'
 
 sudo aireplay-ng -1 3600 -q 10 -a ${bssid} -e ${essid} -c ${client} wlan0mon
 ```
-
 This forces a client to reconnect and trigger ARP traffic.
 
 When you see **Association Succesfull :-)** press CTRL+C to stop the De-Auth process
@@ -184,6 +188,32 @@ curl http://${target}/proof.txt
 - **192.168.1.1** is usually the **gateway/router**, your exit to the rest of the network or internet.
 - Pinging `192.168.1.1` checks if you're actually connected to the router.
 - Pinging `192.168.1.48` means you're pinging yourself — useful only for internal stack checks.
+
+✅ Key Concept
+
+**ARP injection is still the main cracking technique used to flood the network with IVs.**
+
+Deauth is not a replacement, but rather a trigger mechanism to cause the ARP packet to be sent by the client.
+
+📌 It's worth noting that in environments with no active clients or no traffic, it’s common to combine:
+
+        Fake authentication
+
+        Deauth to trigger ARP
+
+        ARP injection
+
+How to do it? with your MAC address! 
+
+Get your interface MAC (before monitor mode) via:
+
+```bash
+cat /sys/class/net/wlan0/address
+```
+or
+```bash
+ip link show wlan0
+```
 
 ### Fake auth differences
 
