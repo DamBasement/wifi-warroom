@@ -95,3 +95,4 @@ Password.........: supersecurewifi
 This is a passive, elegant, and powerful technique.  
 No noise. No clients. Just results.
 
+Next up: Rogue APs!
