@@ -29,8 +29,10 @@ From here, identify
 - ESSID
 - Clients
 
-use TAB and M key to highlight the each APs in order to check also associated clients. 
+Use TAB and M key to highlight the each APs in order to check also associated clients. 
+
 Ideally we want to attack some AP that has already clients connected to it.
+
 Finally, check the channel where the AP is working and run again to get a cleaner output 
 
 ```bash
