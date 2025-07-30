@@ -45,6 +45,7 @@ sudo airodump-ng -c ${channel} wlan0mon
 ## 🎯 Capture Handshake
 
 It's time to Capture the Handshake and for this we'll capture an **authentication handshake**.
+
 **NOTE:** **WPA2 doesn’t reuse IVs as WEP does**. It uses a secure 4-way handshake to derive session keys.
 
     The attack focuses on capturing this handshake, which occurs only when a client **connects** to the network.
