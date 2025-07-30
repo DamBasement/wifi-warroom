@@ -175,4 +175,4 @@ You're inside the network.
 
 ---
 
-Next up: PMKID attacks, hashcat brute force, or rogue APs. Your call.
+Next up: PMKID attacks! 
