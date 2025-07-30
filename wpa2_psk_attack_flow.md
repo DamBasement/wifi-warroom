@@ -119,6 +119,7 @@ aircrack-ng -w ${wordlist} -e ${essid} -b ${bssid} ${dumpfile}-01.cap
 ```
 
 **Substitute `john wordlist` with rockyou.txt if needed.**
+
 ---
 
 ## 🔌 Connect Using wpa_supplicant
