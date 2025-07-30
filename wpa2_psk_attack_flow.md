@@ -48,9 +48,9 @@ It's time to Capture the Handshake and for this we'll capture an **authenticatio
 
 **NOTE:** **WPA2 doesn’t reuse IVs as WEP does**. It uses a secure 4-way handshake to derive session keys.
 
-    The attack focuses on capturing this handshake, which occurs only when a client **connects** to the network.
+The attack focuses on capturing this handshake, which occurs only when a client **connects** to the network.
 
-    The handshake contains hashed information that can be brute-forced **offline** if the password is weak.
+The handshake contains hashed information that can be brute-forced **offline** if the password is weak.
 
 So, we send deauthentication frames to a connected client. The client is forced to disconnect and reconnect. The handshake is captured. BOOM!
 
