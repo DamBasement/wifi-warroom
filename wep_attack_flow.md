@@ -125,6 +125,11 @@ Also, stop monitoring on wlan0mon
 ```bash
 sudo airmon-ng stop wlan0mon
 ```
+
+The real goal is still to collect enough IVs, and ARP injection is the method to make that happen.
+
+Deauth is the catalyst — it increases the chance of getting the needed ARP packet.
+
 ---
 
 ## 🔓 Crack the WEP Key
