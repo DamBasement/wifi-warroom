@@ -2,7 +2,7 @@
 # 🛡️ WEP Attack
 ## Time to perform the attack: 7 minutes
 
-## ⚙️ 0. Initial Setup
+## ⚙️ Initial Setup
 
 Get your interface MAC (before monitor mode) via:
 
