@@ -24,6 +24,7 @@ Perfect for red teamers, OSWP prep, or anyone who thinks air is free real estate
 |------|-------------|
 | `wep_attack_flow.md` | WEP cracking walkthrough using `aircrack-ng` + `wpa_supplicant` |
 | `wpa2_psk_flow.md` | WPA2-PSK handshake capture and offline brute-force |
+| `wpa2_pmkid_flow.md` | WPA2-PSK brute-force |
 | `wpa2_enterprise_rogueAP.md` | WPA2-Enterprise Evil Twin attack with `hostapd-mana` + `freeradius` |
 | `Captive_Portal` | Rogue access point, DNS/DHCP spoofing, and a fake login page to phish Wi-Fi |
 
