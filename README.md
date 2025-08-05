@@ -12,7 +12,7 @@ covering WEP, WPA2-PSK, and WPA2-Enterprise.
 
 - No screenshots.  
 - No GUIs.  
-- **Just command-line and rage.**
+- **Just command-line.**
 
 Perfect for red teamers, OSWP prep, or anyone who thinks air is free real estate.
 
