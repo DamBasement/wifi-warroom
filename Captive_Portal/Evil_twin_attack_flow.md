@@ -1,103 +1,89 @@
 
-# ☠️ Evil Twin Captive Portal
+# ☠️ Evil Twin Captive Portal Lab (Demo Environment)
 
-**Evil Twin + Captive Portal** attack for realistic credential harvesting on open or enterprise Wi-Fi.
+A fully self-contained Evil Twin + Captive Portal lab for educational and authorized demonstration purposes.
 
-This repo sets up a rogue access point, DNS/DHCP spoofing, and a fake login page to phish Wi-Fi credentials.
+This setup lets you simulate a rogue Wi-Fi access point with a fake login portal (Google-style) and log test credentials — all offline and legally.
+
+---
 
 ## ⚙️ Requirements
 
-- Linux (Kali, Ubuntu, etc.)
-- `hostapd`, `dnsmasq`, `php`, `python3`
-- Compatible Wi-Fi card in AP mode
+- Linux (Kali recommended)
+- `hostapd`, `dnsmasq`, `php`, `xterm`
+- One Wi-Fi adapter in AP mode (e.g. Alfa AWUS036NHA)
+- A mobile phone or laptop as the victim device
 
 ---
 
-## 🗂️ Directory Structure
+## 🗂️ Folder Structure
 
 ```
-Captive_Portal/
-
-├── captive_portal.zip
-    ├── index.html           ← Fake login portal (responsive)
-    ├── submit.php           ← Credential logger
-├── hostapd.conf             ← Rogue AP config
-├── dnsmasq.conf             ← DHCP + DNS Spoof config
-├── creds.txt                ← Created at runtime
+evil-twin-lab/
+├── captive_portal/
+│   ├── google.html        ← Fake Google login page
+│   └── submit.php         ← Logs credentials to creds.txt
+├── configs/
+│   ├── hostapd.conf
+│   └── dnsmasq.conf
+├── start_lab.sh           ← Launches everything
+├── creds.txt              ← Populated at runtime
 ```
 
 ---
 
-## 🚀 Step-by-Step Setup
+## 🚀 Run the Lab
 
-### 1. Prepare the environment
+### 1. Make sure your Wi-Fi interface is clean
 
 ```bash
-sudo apt update
-sudo apt install hostapd dnsmasq php
 sudo ip link set wlan0 down
 sudo ip addr flush dev wlan0
+sudo ip link set wlan0 up
 ```
 
-> Replace `wlan0` with your real AP-capable wireless interface.
+> Replace `wlan0` with your interface.
 
 ---
 
-### 2. Launch the Rogue AP
+### 2. Start the lab
 
 ```bash
-sudo hostapd configs/hostapd.conf
+chmod +x start_lab.sh
+sudo ./start_lab.sh
 ```
 
-SSID: `CorpNet`
+Three terminals will open:
+- `hostapd`: Rogue AP with SSID `CorpNet`
+- `dnsmasq`: DHCP + DNS redirect
+- `php`: Fake login page server
 
 ---
 
-### 3. Start DHCP and DNS spoofing
+## 🧪 Test the setup
 
-```bash
-sudo dnsmasq -C configs/dnsmasq.conf
+1. Connect your phone to **CorpNet**
+2. Open a browser and go to:
+
+```
+http://neverssl.com
 ```
 
----
-
-### 4. Run the captive portal web server
-
-```bash
-cd captive_portal/
-sudo php -S 0.0.0.0:80
-```
+3. You’ll be redirected to the fake Google login
+4. Enter test credentials
+5. Check `creds.txt`
 
 ---
 
-### 5. Enable IP forwarding and redirect HTTP traffic
+## ⚠️ Legal & Ethical Use Only
 
-```bash
-sudo sysctl -w net.ipv4.ip_forward=1
-sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 80
-```
-
----
-
-## 📲 Test It
-
-- Connect a mobile phone or test device to `CorpNet`
-- Try to open any website
-- You'll be redirected to the fake login portal
-- Enter fake credentials to test the logger
+This lab is **not** for real-world deployment. Use only:
+- In offline or airgapped environments
+- With your own devices
+- With full awareness and consent of participants
 
 ---
 
-## 🔐 View Captured Credentials
+## 📜 License
 
-```bash
-cat creds.txt
-```
-
----
-
-## 📸 Screenshot (optional)
-
-Add a screenshot of the login portal here.
-
----
+MIT — This project is educational and must be used responsibly.
