@@ -68,6 +68,3 @@ Crafted by [@DamBasement](https://github.com/DamBasement)
 Built in frustration, refined by obsession.
 
 ---
-
-> _“If they control the air, they control the battlefield.”_  
-> — Some layer 2 nihilist, probably
