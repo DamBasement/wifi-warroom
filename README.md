@@ -62,7 +62,7 @@ What controlled env? https://lab.wifichallenge.com/
 
 ---
 
-## 🧠 Author
+## ❤️ Author
 
 Crafted by [@DamBasement](https://github.com/DamBasement)  
 Built in frustration, refined by obsession.
