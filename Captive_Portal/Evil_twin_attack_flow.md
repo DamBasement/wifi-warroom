@@ -18,11 +18,12 @@ This repo sets up a rogue access point, DNS/DHCP spoofing, and a fake login page
 ```
 Captive_Portal/
 
-├── index.html           ← Fake login portal (responsive)
-├── submit.php           ← Credential logger
-├── hostapd.conf         ← Rogue AP config
-├── dnsmasq.conf         ← DHCP + DNS Spoof config
-├── creds.txt            ← Created at runtime
+├── captive_portal.zip
+    ├── index.html           ← Fake login portal (responsive)
+    ├── submit.php           ← Credential logger
+├── hostapd.conf             ← Rogue AP config
+├── dnsmasq.conf             ← DHCP + DNS Spoof config
+├── creds.txt                ← Created at runtime
 ```
 
 ---
