@@ -23,8 +23,10 @@ Perfect for red teamers, OSWP prep, or anyone who thinks air is free real estate
 | File | Description |
 |------|-------------|
 | `wep_attack_flow.md` | WEP cracking walkthrough using `aircrack-ng` + `wpa_supplicant` |
-| `wpa2_psk_crack.md` | WPA2-PSK handshake capture and offline brute-force |
-| `enterprise_mitm_eap.md` | WPA2-Enterprise Evil Twin attack with `hostapd-mana` + `freeradius` |
+| `wpa2_psk_flow.md` | WPA2-PSK handshake capture and offline brute-force |
+| `wpa2_enterprise_rogueAP.md` | WPA2-Enterprise Evil Twin attack with `hostapd-mana` + `freeradius` |
+| `Captive_Portal` | Rogue access point, DNS/DHCP spoofing, and a fake login page to phish Wi-Fi |
+
 
 ---
 
@@ -35,6 +37,8 @@ Perfect for red teamers, OSWP prep, or anyone who thinks air is free real estate
 - `hostapd-mana`, `freeradius`
 - `iw`, `ip`, `dhclient`
 - `tshark`, `Wireshark`
+- `DNS/DHCP spoofing`
+- `HTML + php`
 
 All CLI. All tested.  
 Most run fine over SSH if you like to break things from a distance.
