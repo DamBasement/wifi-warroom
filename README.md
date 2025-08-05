@@ -58,7 +58,7 @@ Most run fine over SSH if you like to break things from a distance.
 ## ⚠️ Notes & Crediz!
 
 All techniques tested in **controlled environments**.
-# What controlled env? https://lab.wifichallenge.com/
+What controlled env? https://lab.wifichallenge.com/
 
 ---
 
