@@ -1,6 +1,11 @@
 # 🛰️ WiFi-warROOOOOOM
 
 **Protocols are weak. Frequencies are open.**  
+
+<div align="center">
+  <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXphaWtrOHgwbHJxaWM5Y25oOGQ2dGQzZHZnM3dlZ2g4d29pYTNzZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT1XGYfsullHcbqoFi/giphy.gif" width="500"/>
+</div>  
+
 This is my war log — a CLI-first battleground for wireless exploitation.
 
 ---
